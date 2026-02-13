@@ -10,11 +10,17 @@ import (
 
 	"net/http"
 
+	"github.com/northmaxota/task-api/internal/config"
 	httpServer "github.com/northmaxota/task-api/internal/http"
 )
 
 func main() {
-	server := httpServer.NewServer(":8080")
+	cfg, err := config.Load()
+	if err != nil {
+		log.Printf("Failed to load config: %v", err)
+		return
+	}
+	server := httpServer.NewServer(cfg)
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
@@ -29,13 +35,13 @@ func main() {
 		}
 	}()
 
-	log.Println("Starting server on :8080")
+	log.Printf("Starting server on %s\n", cfg.Port)
 	if err := server.ListenAndServe(); err != nil {
 		if err == http.ErrServerClosed {
 			log.Println("Server closed under request")
 			return
 		}
-		log.Printf("Could not listen on :8080: %v\n", err)
+		log.Printf("Could not listen on %s: %v\n", cfg.Port, err)
 	}
 
 }

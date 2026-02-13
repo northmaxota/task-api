@@ -2,11 +2,11 @@ package http
 
 import (
 	"net/http"
-	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 
+	"github.com/northmaxota/task-api/internal/config"
 	mw "github.com/northmaxota/task-api/internal/middleware"
 )
 
@@ -20,13 +20,13 @@ func NewRouter() http.Handler {
 	return r
 }
 
-func NewServer(addr string) *http.Server {
+func NewServer(cfg config.Config) *http.Server {
 	return &http.Server{
-		Addr:         addr,
+		Addr:         cfg.Port,
 		Handler:      NewRouter(),
-		ReadTimeout:  5 * time.Second,
-		WriteTimeout: 5 * time.Second,
-		IdleTimeout:  30 * time.Second,
+		ReadTimeout:  cfg.ReadTimeout,
+		WriteTimeout: cfg.WriteTimeout,
+		IdleTimeout:  cfg.IdleTimeout,
 	}
 }
 
