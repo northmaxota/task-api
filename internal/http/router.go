@@ -10,10 +10,13 @@ import (
 	mw "github.com/northmaxota/task-api/internal/middleware"
 )
 
-func NewRouter() http.Handler {
+func NewRouter(h *Handler) http.Handler {
 	r := chi.NewRouter()
 	r.Use(mw.Logging)
 	r.Use(middleware.Recoverer)
+
+	r.Post("/tasks", h.CreateTask)
+	r.Get("/tasks", h.GetTasks)
 
 	r.Get("/health", HealthCheckHandler)
 
@@ -23,7 +26,6 @@ func NewRouter() http.Handler {
 func NewServer(cfg config.Config) *http.Server {
 	return &http.Server{
 		Addr:         cfg.Port,
-		Handler:      NewRouter(),
 		ReadTimeout:  cfg.ReadTimeout,
 		WriteTimeout: cfg.WriteTimeout,
 		IdleTimeout:  cfg.IdleTimeout,

@@ -12,6 +12,7 @@ import (
 
 	"github.com/northmaxota/task-api/internal/config"
 	httpServer "github.com/northmaxota/task-api/internal/http"
+	"github.com/northmaxota/task-api/internal/task"
 )
 
 func main() {
@@ -20,6 +21,7 @@ func main() {
 		log.Printf("Failed to load config: %v", err)
 		return
 	}
+
 	server := httpServer.NewServer(cfg)
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
@@ -34,6 +36,12 @@ func main() {
 			log.Printf("Server Shutdown Failed:%+v", err)
 		}
 	}()
+
+	storage := task.NewInMemoryStorage()
+	service := task.NewService(storage)
+	handler := httpServer.NewHandler(service)
+	router := httpServer.NewRouter(handler)
+	server.Handler = router
 
 	log.Printf("Starting server on %s\n", cfg.Port)
 	if err := server.ListenAndServe(); err != nil {
