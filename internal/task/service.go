@@ -2,15 +2,20 @@ package task
 
 import "errors"
 
-type Service struct {
+type TaskService struct {
 	storage Storage
 }
 
-func NewService(storage Storage) *Service {
-	return &Service{storage: storage}
+type Service interface {
+	Create(title string) (Task, error)
+	GetAll() ([]Task, error)
 }
 
-func (s *Service) Create(title string) (Task, error) {
+func NewService(storage Storage) Service {
+	return &TaskService{storage: storage}
+}
+
+func (s *TaskService) Create(title string) (Task, error) {
 	if title == "" {
 		return Task{}, errors.New("title is required")
 	}
@@ -23,6 +28,6 @@ func (s *Service) Create(title string) (Task, error) {
 	return s.storage.Create(task)
 }
 
-func (s *Service) GetAll() ([]Task, error) {
+func (s *TaskService) GetAll() ([]Task, error) {
 	return s.storage.GetAll()
 }
