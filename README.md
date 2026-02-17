@@ -44,6 +44,8 @@ storage := task.NewInMemoryStorage()
 baseService := task.NewService(storage)
 service := task.NewLoggingService(baseService)
 handler := httpServer.NewHandler(service)
+router = httpServer.NewRouter(handler)
+server.Handler = router
 ```
 
 ---
