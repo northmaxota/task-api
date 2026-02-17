@@ -1,6 +1,8 @@
 package task
 
-import "errors"
+import (
+	"github.com/northmaxota/task-api/internal/domain"
+)
 
 type TaskService struct {
 	storage Storage
@@ -17,7 +19,7 @@ func NewService(storage Storage) Service {
 
 func (s *TaskService) Create(title string) (Task, error) {
 	if title == "" {
-		return Task{}, errors.New("title is required")
+		return Task{}, domain.ErrTitleRequired
 	}
 
 	task := Task{
