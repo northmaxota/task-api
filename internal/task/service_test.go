@@ -1,6 +1,7 @@
 package task_test
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/northmaxota/task-api/internal/domain"
@@ -48,9 +49,8 @@ func TestService_Create_EmptyTitle(t *testing.T) {
 		t.Fatal("Expected error for empty title, got nil")
 	}
 
-	expectedErr := domain.ErrTitleRequired.Error()
-	if err.Error() != expectedErr {
-		t.Errorf("Expected error %q, got %q", expectedErr, err.Error())
+	if !errors.Is(err, domain.ErrTitleRequired) {
+		t.Errorf("Expected error %q, got %q", domain.ErrTitleRequired, err.Error())
 	}
 }
 
@@ -59,8 +59,14 @@ func TestService_GetAll(t *testing.T) {
 	svc := task.NewService(storage)
 
 	// Create some tasks
-	svc.Create("Task 1")
-	svc.Create("Task 2")
+	_, err := svc.Create("Task 1")
+	if err != nil {
+		t.Fatalf("Expected no error, got %v", err)
+	}
+	_, err = svc.Create("Task 2")
+	if err != nil {
+		t.Fatalf("Expected no error, got %v", err)
+	}
 
 	tasks, err := svc.GetAll()
 	if err != nil {
