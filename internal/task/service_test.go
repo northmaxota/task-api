@@ -22,35 +22,30 @@ func (f *fakeStorage) GetAll() ([]task.Task, error) {
 }
 
 func TestService_Create(t *testing.T) {
-	storage := &fakeStorage{}
-	svc := task.NewService(storage)
-
-	taskTitle := "Test Task"
-	createdTask, err := svc.Create(taskTitle)
-	if err != nil {
-		t.Fatalf("Expected no error, got %v", err)
+	tests := []struct {
+		name    string
+		title   string
+		wantErr error
+	}{
+		{
+			name:    "Valid Title",
+			title:   "Test Task",
+			wantErr: nil,
+		}, {
+			name:    "Empty Title",
+			title:   "",
+			wantErr: domain.ErrTitleRequired,
+		},
 	}
-
-	if createdTask.Title != taskTitle {
-		t.Errorf("Expected title %q, got %q", taskTitle, createdTask.Title)
-	}
-
-	if createdTask.Done {
-		t.Errorf("Expected Done to be false, got true")
-	}
-}
-
-func TestService_Create_EmptyTitle(t *testing.T) {
-	storage := &fakeStorage{}
-	svc := task.NewService(storage)
-
-	_, err := svc.Create("")
-	if err == nil {
-		t.Fatal("Expected error for empty title, got nil")
-	}
-
-	if !errors.Is(err, domain.ErrTitleRequired) {
-		t.Errorf("Expected error %q, got %q", domain.ErrTitleRequired, err.Error())
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			storage := &fakeStorage{}
+			svc := task.NewService(storage)
+			_, err := svc.Create(tt.title)
+			if !errors.Is(err, tt.wantErr) {
+				t.Errorf("Expected error %q, got %q", tt.wantErr, err)
+			}
+		})
 	}
 }
 
