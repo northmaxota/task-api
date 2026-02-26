@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"log"
 	"os"
 	"os/signal"
@@ -14,6 +15,8 @@ import (
 	httpServer "github.com/northmaxota/task-api/internal/http"
 	"github.com/northmaxota/task-api/internal/storage"
 	"github.com/northmaxota/task-api/internal/task"
+
+	_ "github.com/jackc/pgx/v5/stdlib"
 )
 
 func main() {
@@ -38,7 +41,18 @@ func main() {
 		}
 	}()
 
-	storage := storage.NewInMemoryStorage()
+	dsn := "postgres://taskuser:taskpass@localhost:5432/taskdb?sslmode=disable"
+
+	db, err := sql.Open("pgx", dsn)
+	if err != nil {
+		log.Fatal("Failed to connect to database:", err)
+	}
+
+	if err := db.Ping(); err != nil {
+		log.Fatal(err)
+	}
+
+	storage := storage.NewPostgresStorage(db)
 	baseService := task.NewService(storage)
 	service := task.NewLoggingService(baseService)
 	handler := httpServer.NewHandler(service)
