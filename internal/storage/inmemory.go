@@ -1,24 +1,26 @@
-package task
+package storage
 
 import (
 	"context"
 	"sync"
+
+	"github.com/northmaxota/task-api/internal/task"
 )
 
 type InMemoryStorage struct {
 	mu     sync.Mutex
-	tasks  []Task
+	tasks  []task.Task
 	nextID int
 }
 
 func NewInMemoryStorage() *InMemoryStorage {
 	return &InMemoryStorage{
-		tasks:  make([]Task, 0),
+		tasks:  make([]task.Task, 0),
 		nextID: 1,
 	}
 }
 
-func (s *InMemoryStorage) Create(ctx context.Context, task Task) (Task, error) {
+func (s *InMemoryStorage) Create(ctx context.Context, task task.Task) (task.Task, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -28,9 +30,9 @@ func (s *InMemoryStorage) Create(ctx context.Context, task Task) (Task, error) {
 	return task, nil
 }
 
-func (s *InMemoryStorage) GetAll(ctx context.Context) ([]Task, error) {
+func (s *InMemoryStorage) GetAll(ctx context.Context) ([]task.Task, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	return append([]Task(nil), s.tasks...), nil
+	return append([]task.Task(nil), s.tasks...), nil
 }

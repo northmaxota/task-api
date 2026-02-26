@@ -12,6 +12,7 @@ import (
 
 	"github.com/northmaxota/task-api/internal/config"
 	httpServer "github.com/northmaxota/task-api/internal/http"
+	"github.com/northmaxota/task-api/internal/storage"
 	"github.com/northmaxota/task-api/internal/task"
 )
 
@@ -37,7 +38,7 @@ func main() {
 		}
 	}()
 
-	storage := task.NewInMemoryStorage()
+	storage := storage.NewInMemoryStorage()
 	baseService := task.NewService(storage)
 	service := task.NewLoggingService(baseService)
 	handler := httpServer.NewHandler(service)
