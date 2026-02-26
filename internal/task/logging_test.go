@@ -1,6 +1,7 @@
 package task_test
 
 import (
+	"context"
 	"testing"
 
 	"github.com/northmaxota/task-api/internal/domain"
@@ -13,20 +14,20 @@ type fakeService struct {
 	returnErr error
 }
 
-func (f *fakeService) Create(title string) (task.Task, error) {
+func (f *fakeService) Create(ctx context.Context, title string) (task.Task, error) {
 	f.called = true
 	f.tasks = task.Task{Title: title}
 	return f.tasks, f.returnErr
 }
 
-func (f *fakeService) GetAll() ([]task.Task, error) {
+func (f *fakeService) GetAll(ctx context.Context) ([]task.Task, error) {
 	return nil, nil
 }
 
 func TestLoggingService_Create_Success(t *testing.T) {
 	fake := &fakeService{}
 	loggingSvc := task.NewLoggingService(fake)
-	_, err := loggingSvc.Create("Test Task")
+	_, err := loggingSvc.Create(t.Context(), "Test Task")
 	if err != nil {
 		t.Errorf("Expected no error, got %v", err)
 	}
@@ -38,7 +39,7 @@ func TestLoggingService_Create_Success(t *testing.T) {
 func TestLoggingService_Create_Error(t *testing.T) {
 	fake := &fakeService{returnErr: domain.ErrTitleRequired}
 	loggingSvc := task.NewLoggingService(fake)
-	_, err := loggingSvc.Create("")
+	_, err := loggingSvc.Create(t.Context(), "")
 	if err == nil {
 		t.Error("Expected an error, got nil")
 	}

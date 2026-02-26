@@ -1,6 +1,7 @@
 package http_test
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
@@ -20,12 +21,12 @@ type fakeService struct {
 	returnErr    error
 }
 
-func (f *fakeService) Create(title string) (task.Task, error) {
+func (f *fakeService) Create(ctx context.Context, title string) (task.Task, error) {
 	f.createCalled = true
 	return f.returnTask, f.returnErr
 }
 
-func (f *fakeService) GetAll() ([]task.Task, error) {
+func (f *fakeService) GetAll(ctx context.Context) ([]task.Task, error) {
 	f.getAllCalled = true
 	return f.returnTasks, f.returnErr
 }

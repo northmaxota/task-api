@@ -1,6 +1,7 @@
 package task
 
 import (
+	"context"
 	"log"
 	"time"
 )
@@ -13,8 +14,8 @@ func NewLoggingService(next Service) Service {
 	return &loggingService{next: next}
 }
 
-func (l *loggingService) Create(title string) (Task, error) {
-	task, err := l.next.Create(title)
+func (l *loggingService) Create(ctx context.Context, title string) (Task, error) {
+	task, err := l.next.Create(ctx, title)
 	if err != nil {
 		return Task{}, err
 	}
@@ -23,8 +24,8 @@ func (l *loggingService) Create(title string) (Task, error) {
 	return task, nil
 }
 
-func (l *loggingService) GetAll() ([]Task, error) {
-	tasks, err := l.next.GetAll()
+func (l *loggingService) GetAll(ctx context.Context) ([]Task, error) {
+	tasks, err := l.next.GetAll(ctx)
 	if err != nil {
 		return nil, err
 	}

@@ -25,7 +25,7 @@ func (h *Handler) CreateTask(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	task, err := h.service.Create(req.Title)
+	task, err := h.service.Create(r.Context(), req.Title)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -36,7 +36,7 @@ func (h *Handler) CreateTask(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) GetTasks(w http.ResponseWriter, r *http.Request) {
-	tasks, err := h.service.GetAll()
+	tasks, err := h.service.GetAll(r.Context())
 	if err != nil {
 		http.Error(w, "Failed to retrieve tasks", http.StatusInternalServerError)
 		return

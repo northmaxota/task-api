@@ -1,6 +1,9 @@
 package task
 
-import "sync"
+import (
+	"context"
+	"sync"
+)
 
 type InMemoryStorage struct {
 	mu     sync.Mutex
@@ -15,7 +18,7 @@ func NewInMemoryStorage() *InMemoryStorage {
 	}
 }
 
-func (s *InMemoryStorage) Create(task Task) (Task, error) {
+func (s *InMemoryStorage) Create(ctx context.Context, task Task) (Task, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -25,7 +28,7 @@ func (s *InMemoryStorage) Create(task Task) (Task, error) {
 	return task, nil
 }
 
-func (s *InMemoryStorage) GetAll() ([]Task, error) {
+func (s *InMemoryStorage) GetAll(ctx context.Context) ([]Task, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 

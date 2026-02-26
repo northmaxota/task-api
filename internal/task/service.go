@@ -1,6 +1,8 @@
 package task
 
 import (
+	"context"
+
 	"github.com/northmaxota/task-api/internal/domain"
 )
 
@@ -9,15 +11,15 @@ type TaskService struct {
 }
 
 type Service interface {
-	Create(title string) (Task, error)
-	GetAll() ([]Task, error)
+	Create(ctx context.Context, title string) (Task, error)
+	GetAll(ctx context.Context) ([]Task, error)
 }
 
 func NewService(storage Storage) Service {
 	return &TaskService{storage: storage}
 }
 
-func (s *TaskService) Create(title string) (Task, error) {
+func (s *TaskService) Create(ctx context.Context, title string) (Task, error) {
 	if title == "" {
 		return Task{}, domain.ErrTitleRequired
 	}
@@ -27,9 +29,15 @@ func (s *TaskService) Create(title string) (Task, error) {
 		Done:  false,
 	}
 
-	return s.storage.Create(task)
+	select {
+	case <-ctx.Done():
+		return Task{}, ctx.Err()
+	default:
+	}
+
+	return s.storage.Create(ctx, task)
 }
 
-func (s *TaskService) GetAll() ([]Task, error) {
-	return s.storage.GetAll()
+func (s *TaskService) GetAll(ctx context.Context) ([]Task, error) {
+	return s.storage.GetAll(ctx)
 }

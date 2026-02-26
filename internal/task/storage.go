@@ -1,6 +1,8 @@
 package task
 
+import "context"
+
 type Storage interface {
-	Create(task Task) (Task, error)
-	GetAll() ([]Task, error)
+	Create(ctx context.Context, task Task) (Task, error)
+	GetAll(ctx context.Context) ([]Task, error)
 }
