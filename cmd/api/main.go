@@ -41,7 +41,10 @@ func main() {
 		}
 	}()
 
-	dsn := "postgres://taskuser:taskpass@localhost:5432/taskdb?sslmode=disable"
+	dsn := os.Getenv("POSTGRES_DSN")
+	if dsn == "" {
+		log.Fatal("POSTGRES_DSN environment variable is required")
+	}
 
 	db, err := sql.Open("pgx", dsn)
 	if err != nil {
